@@ -94,9 +94,8 @@ class Game {
         // main actions: COLONIZE | RESUPPLY
         // bonus actions: ENERGY_CORE | ALIEN_ARTIFACT | TECH_RESEARCH | NEW_TECH
         if (shouldUseEnergyCore()) {
-            System.out.println("ENERGY_CORE");
+            return;
         }
-
 
         if (investInPlanet()) {
             return;
@@ -115,8 +114,6 @@ class Game {
                 ratedPairs.put(pair, rating);
             }
         }
-        System.err.println(ratedPairs);
-
 
         Optional<Map.Entry<StationPlanetPair, Integer>> bestRating = ratedPairs.entrySet().stream()
                 .max(Comparator.comparingInt(Map.Entry::getValue));
@@ -195,7 +192,11 @@ class Game {
                 break;
             }
         }
-        return getAvailableStations().size() == 0 && energyCoreAvailable;
+        if (getAvailableStations().size() == 0 && energyCoreAvailable) {
+            System.out.println("ENERGY_CORE");
+            return true;
+        }
+        return false;
     }
 }
 
