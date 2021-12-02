@@ -115,21 +115,32 @@ class Game {
         // main actions: COLONIZE | RESUPPLY
         // bonus actions: ENERGY_CORE | ALIEN_ARTIFACT | TECH_RESEARCH | NEW_TECH
 
-        /**
-         * Check and do bonus moves, which will give us another turn
-         */
-        if (shouldUseEnergyCore()) {
-            return;
-        }
-        if (checkTechupgrades()) {
-            return;
+        // Safeguard, just we don't loose everything if if we buggerd up some edge cases
+        try {
+            /**
+             * Check and do bonus moves, which will give us another turn
+             */
+            if (shouldUseEnergyCore()) {
+                return;
+            }
+            if (checkTechupgrades()) {
+                return;
+            }
+        } catch (Exception e) {
+            System.err.print("We f'ed up in main actions somewhere: ");
+            e.printStackTrace();
         }
 
-        /**
-         * Main actions. Will end our turn and let the opponent move.
-         */
-        if (investInPlanet()) {
-            return;
+        try {
+            /**
+             * Main actions. Will end our turn and let the opponent move.
+             */
+            if (investInPlanet()) {
+                return;
+            }
+        } catch (Exception e) {
+            System.err.print("We f'ed up in main actions somewhere: ");
+            e.printStackTrace();
         }
         System.out.println("RESUPPLY");
     }
