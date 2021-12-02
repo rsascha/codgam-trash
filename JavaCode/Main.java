@@ -141,8 +141,10 @@ class Game {
 
         if (bestRating.isPresent()) {
             StationPlanetPair bestPair = bestRating.get().getKey();
-            colonize(bestPair);
-            return true;
+            if (ratedPairs.get(bestPair) > 0) {
+                colonize(bestPair);
+                return true;
+            }
         }
         return false;
     }
@@ -154,20 +156,22 @@ class Game {
      * 
      * @param station
      * @param planet
-     * @return score of the move. the higher the value, the preferable
+     * @return score of the move. the higher the value, the preferable. If 0, don't
+     *         do the move.
      */
     private int ratePair(Station station, Planet planet) {
         List<Integer> tech = station.tech;
         List<Integer> tasks = planet.tasks;
-        
 
         int investable = 0;
         for (int i = 0; i < 4; i++) {
             investable += Math.min(tech.get(i), tasks.get(i));
         }
 
-        // This move wouldn't do anything, no sense in checking other conditions on this move
-        if (investable == 0) return 0;
+        // This move wouldn't do anything, no sense in checking other conditions on this
+        // move
+        if (investable == 0)
+            return 0;
 
         // Can we sack a planet with our move?
         if ((planet.myContribution + investable) >= planet.remainingPrice()) {
@@ -188,16 +192,18 @@ class Game {
         if (planet.oppContribution < planet.remainingPrice()) {
             return investable;
         }
-        // Can't get the planet anymore. Have we already invested? If not, doing so will at least give us a bonus
+        // Can't get the planet anymore. Have we already invested? If not, doing so will
+        // at least give us a bonus
         if (planet.myContribution == 0) {
-            // We can't win the planet anymore, so investing 1 of 5 tech makes no difference anymore,
+            // We can't win the planet anymore, so investing 1 of 5 tech makes no difference
+            // anymore,
             // so give them all the same value.
             return 1;
         }
         // Can't get the planet anymore. No sense in helping the opponent.
         return 0;
     }
-    
+
     private boolean canColonizePlanet() {
         for (Station myStation : getAvailableStations()) {
             for (Planet planet : planets) {
