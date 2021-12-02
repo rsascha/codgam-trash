@@ -151,8 +151,11 @@ class Game {
 
     /**
      * Give a rating how beneficial this move would be. Considers:
-     * * How many if our points would we invest?
      * * Will be earn the planet when doing the move?
+     * * Can we still get the target planet?
+     * * How many of our points would we invest?
+     * * Have we invested anything into the planet yet?
+     * * Avoid investing if it would help the opponent
      * 
      * @param station
      * @param planet
@@ -188,7 +191,7 @@ class Game {
             }
             return score;
         }
-        // Can't snack planet in one move, but can we still get it?
+        // Can't sack planet in one move, but can we still get it?
         if (planet.oppContribution < planet.remainingPrice()) {
             return investable;
         }
