@@ -7,3 +7,6 @@ build-main:
 
 play: build-data build-main
 	java StreamData | java Player
+
+play-without-data-build: build-main
+	java StreamData | java Player
