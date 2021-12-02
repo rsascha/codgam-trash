@@ -359,6 +359,7 @@ class Player {
                     Arrays.asList(obj0, obj1, obj2, obj3), mine);
             mainGame.stationObjectives.put(stationId, stationObjective);
         }
+        System.err.println("Read global state");
 
         // game loop
         while (true) {
@@ -421,6 +422,7 @@ class Player {
                                                          // points
             mainGame.oppColonizationScore = in.nextInt();
 
+            System.err.println("Read round state");
             mainGame.play();
         }
     }

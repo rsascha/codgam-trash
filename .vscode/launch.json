@@ -6,12 +6,22 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Launch Player Debug Input",
+            "name": "First round",
             "request": "launch",
             "mainClass": "Player",
             "projectName": "codgam-trash_b929adec",
             "args": [
                 "<", "./sascha/first-round.txt"
+            ]
+        },
+        {
+            "type": "java",
+            "name": "Four rounds",
+            "request": "launch",
+            "mainClass": "Player",
+            "projectName": "codgam-trash_b929adec",
+            "args": [
+                "<", "./data/four-rounds.txt"
             ]
         }
     ]
