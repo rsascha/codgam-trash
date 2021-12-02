@@ -46,6 +46,18 @@ class Planet {
         this.colonizationScore = colonizationScore;
         this.bonuses = bonuses;
     }
+
+    int pointsToMajority() {
+        return (int) Math.ceil(price() / 2.0);
+    }
+
+    int price() {
+        int totalPrice = 0;
+        for (int task : tasks) {
+            totalPrice += task;
+        }
+        return totalPrice + myContribution + oppContribution;
+    }
 }
 
 class Game {
@@ -115,11 +127,14 @@ class Game {
             }
         }
 
+        System.err.println(ratedPairs);
+
         Optional<Map.Entry<StationPlanetPair, Integer>> bestRating = ratedPairs.entrySet().stream()
                 .max(Comparator.comparingInt(Map.Entry::getValue));
 
         if (bestRating.isPresent()) {
             StationPlanetPair bestPair = bestRating.get().getKey();
+            System.err.println(bestRating);
             colonize(bestPair.station, bestPair.planet);
             return true;
         }
@@ -134,7 +149,12 @@ class Game {
         for (int i = 0; i < 4; i++) {
             rating += Math.min(tech.get(i), tasks.get(i));
         }
-        return rating;
+
+        // Planet Price 5
+        // myContribution 0
+        // rating 2
+
+        return planet.pointsToMajority() - planet.myContribution - rating;
     }
 
     private boolean canInvestAllPoints(Station myStation, Planet planet) {
