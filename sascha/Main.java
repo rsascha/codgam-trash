@@ -76,13 +76,25 @@ class Game {
         oppColonizationScore = 0;
     }
 
+    private List<Station> availableStations;
+    private List<Station> getAvailableStations() {
+        return myStations.removeIf(x -> {return !x.available; });
+    }
+    private List<Station> unavailableStations;
+    private List<Station> getUnavailableStations() {
+        return myStations.removeIf(x -> {return x.available; });
+    }
+
     public void play() {
         // main actions: COLONIZE | RESUPPLY
         // bonus actions: ENERGY_CORE | ALIEN_ARTIFACT | TECH_RESEARCH | NEW_TECH
 
-        myStations.forEach(station -> {
-            System.err.println("My Station " + station.id + " is available==" + station.available + " with tech: " + station.tech);
+        unavailableStations.forEach(station -> {
+            System.err.println("My Station " + station.id + " is unavailable with tech: " + station.tech);
+        });
 
+        availableStations.forEach(station -> {
+            System.err.println("My Station " + station.id + " is available with tech: " + station.tech);
         });
 
 
