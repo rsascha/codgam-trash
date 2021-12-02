@@ -79,6 +79,14 @@ class Game {
     public void play() {
         // main actions: COLONIZE | RESUPPLY
         // bonus actions: ENERGY_CORE | ALIEN_ARTIFACT | TECH_RESEARCH | NEW_TECH
+
+        myStations.forEach(station -> {
+            System.err.println("My Station " + station.id + " is available==" + station.available + " with tech: " + station.tech);
+
+        });
+
+
+
         System.out.println("RESUPPLY");
     }
 }
