@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 class StationObjective {
     public int stationId;
@@ -83,17 +84,41 @@ class Game {
     public void play() {
         // main actions: COLONIZE | RESUPPLY
         // bonus actions: ENERGY_CORE | ALIEN_ARTIFACT | TECH_RESEARCH | NEW_TECH
+        if (investInPlanet()) {
+            return;
+        }
         if (canColonizePlanet()) {
             return;
         }
         System.out.println("RESUPPLY");
     }
 
-    private boolean canColonizePlanet() {
-        for (Station myStation : myStations) {
-            if (!myStation.available) {
-                continue;
+    private boolean investInPlanet() {
+        for (Station myStation : getAvailable()) {
+            for (Planet planet : planets) {
+                if (canInvestAllPoints(myStation, planet)) {
+                    colonize(myStation, planet);
+                    return true;
+                }
             }
+        }
+        return false;
+    }
+
+    private boolean canInvestAllPoints(Station myStation, Planet planet) {
+        List<Integer> tech = myStation.tech;
+        List<Integer> tasks = planet.tasks;
+
+        for (int i = 0; i < 4; i++) {
+            if (tech.get(i) > tasks.get(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean canColonizePlanet() {
+        for (Station myStation : getAvailable()) {
             for (Planet planet : planets) {
                 if (canColonizePlanet(myStation, planet)) {
                     colonize(myStation, planet);
@@ -119,6 +144,12 @@ class Game {
     void colonize(Station myStation, Planet planet) {
         // TODO: Decide bonus
         System.out.println("COLONIZE " + myStation.id + " " + planet.id + " 0");
+    }
+
+    List<Station> getAvailable() {
+        return myStations.stream()
+                .filter(station -> station.available)
+                .collect(Collectors.toList());
     }
 }
 
