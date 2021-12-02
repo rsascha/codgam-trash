@@ -1,9 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 class StationObjective {
@@ -65,6 +60,18 @@ class Game {
     public int myColonizationScore;
     public int oppColonizationScore;
 
+    static class StationPlanetPair {
+        Station station;
+        Planet planet;
+
+        public StationPlanetPair(Station station, Planet planet) {
+            this.station = station;
+            this.planet = planet;
+        }
+    }
+
+    Map<StationPlanetPair, Integer> ratedPairs;
+
     public Game() {
         sectorIndex = 0;
         myStations = new ArrayList<>();
@@ -75,6 +82,7 @@ class Game {
         stationObjectives = new HashMap<>();
         myColonizationScore = 0;
         oppColonizationScore = 0;
+        ratedPairs = new HashMap<>();
     }
 
     enum Tech {
@@ -82,8 +90,14 @@ class Game {
     }
 
     public void play() {
+        ratedPairs.clear();
         // main actions: COLONIZE | RESUPPLY
         // bonus actions: ENERGY_CORE | ALIEN_ARTIFACT | TECH_RESEARCH | NEW_TECH
+        if (shouldUseEnergyCore()) {
+            System.out.println("ENERGY_CORE");
+        }
+
+
         if (investInPlanet()) {
             return;
         }
@@ -94,15 +108,36 @@ class Game {
     }
 
     private boolean investInPlanet() {
-        for (Station myStation : getAvailable()) {
+        for (Station myStation : getAvailableStations()) {
             for (Planet planet : planets) {
-                if (canInvestAllPoints(myStation, planet)) {
-                    colonize(myStation, planet);
-                    return true;
-                }
+                StationPlanetPair pair = new StationPlanetPair(myStation, planet);
+                int rating = ratePair(myStation, planet);
+                ratedPairs.put(pair, rating);
             }
         }
+        System.err.println(ratedPairs);
+
+
+        Optional<Map.Entry<StationPlanetPair, Integer>> bestRating = ratedPairs.entrySet().stream()
+                .max(Comparator.comparingInt(Map.Entry::getValue));
+
+        if (bestRating.isPresent()) {
+            StationPlanetPair bestPair = bestRating.get().getKey();
+            colonize(bestPair.station, bestPair.planet);
+            return true;
+        }
         return false;
+    }
+
+    private int ratePair(Station station, Planet planet) {
+        List<Integer> tech = station.tech;
+        List<Integer> tasks = planet.tasks;
+
+        int rating = 0;
+        for (int i = 0; i < 4; i++) {
+            rating += Math.min(tech.get(i), tasks.get(i));
+        }
+        return rating;
     }
 
     private boolean canInvestAllPoints(Station myStation, Planet planet) {
@@ -118,7 +153,7 @@ class Game {
     }
 
     private boolean canColonizePlanet() {
-        for (Station myStation : getAvailable()) {
+        for (Station myStation : getAvailableStations()) {
             for (Planet planet : planets) {
                 if (canColonizePlanet(myStation, planet)) {
                     colonize(myStation, planet);
@@ -146,10 +181,21 @@ class Game {
         System.out.println("COLONIZE " + myStation.id + " " + planet.id + " 0");
     }
 
-    List<Station> getAvailable() {
+    List<Station> getAvailableStations() {
         return myStations.stream()
                 .filter(station -> station.available)
                 .collect(Collectors.toList());
+    }
+
+    boolean shouldUseEnergyCore() {
+        boolean energyCoreAvailable = false;
+        for (String bonus : myBonuses) {
+            if (bonus.equals("ENERGY_CORE")) {
+                energyCoreAvailable = true;
+                break;
+            }
+        }
+        return getAvailableStations().size() == 0 && energyCoreAvailable;
     }
 }
 
