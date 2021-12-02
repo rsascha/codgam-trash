@@ -150,9 +150,9 @@ class Game {
             StationPlanetPair bestPair = bestRating.get().getKey();
             int rating = ratedPairs.get(bestPair);
             if (rating > 0) {
-                colonize(bestPair);
                 System.err
                         .println("Chosen: [(" + bestPair.station.id + "->" + bestPair.planet.id + "):" + rating + "]");
+                colonize(bestPair);
                 return true;
             }
         }
