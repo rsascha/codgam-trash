@@ -47,16 +47,24 @@ class Planet {
         this.bonuses = bonuses;
     }
 
-    int pointsToMajority() {
-        return (int) Math.ceil(price() / 2.0);
+    int majority() {
+        return (int) Math.ceil(totalPrice() / 2.0);
     }
 
-    int price() {
+    int totalPrice() {
         int totalPrice = 0;
         for (int task : tasks) {
             totalPrice += task;
         }
         return totalPrice + myContribution + oppContribution;
+    }
+
+    int remainingPrice() {
+        int price = 0;
+        for (int task : tasks) {
+            price += task;
+        }
+        return price;
     }
 }
 
@@ -120,7 +128,7 @@ class Game {
 
     private boolean investInPlanet() {
         for (Station myStation : getAvailableStations()) {
-            for (Planet planet : planets) {
+            for (Planet planet : getRelevantPlanets()) {
                 StationPlanetPair pair = new StationPlanetPair(myStation, planet);
                 int rating = ratePair(myStation, planet);
                 ratedPairs.put(pair, rating);
@@ -153,9 +161,15 @@ class Game {
         // Planet Price 5
         // myContribution 0
         // rating 2
+        System.err.println("majority: " + planet.majority());
+        System.err.println("myContribution: " + planet.myContribution);
+        System.err.println("investable: " + investable);
 
-        int missing = planet.pointsToMajority() - planet.myContribution;
-        return investable - missing;
+        int missing = Math.max(planet.majority() - planet.myContribution, 0);
+        int result = planet.majority() - Math.abs(missing - investable);
+        System.err.println("missing:" + missing);
+        System.err.println("result:" + result);
+        return result;
     }
 
     private boolean canInvestAllPoints(Station myStation, Planet planet) {
@@ -202,6 +216,12 @@ class Game {
     List<Station> getAvailableStations() {
         return myStations.stream()
                 .filter(station -> station.available)
+                .collect(Collectors.toList());
+    }
+
+    List<Planet> getRelevantPlanets() {
+        return planets.stream()
+                .filter(planet -> planet.oppContribution < planet.myContribution + planet.remainingPrice())
                 .collect(Collectors.toList());
     }
 
