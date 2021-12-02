@@ -76,10 +76,49 @@ class Game {
         oppColonizationScore = 0;
     }
 
+    enum Tech {
+        TERRA, ETHIC, ENGINEERING, AGRICULTURE;
+    }
+
     public void play() {
         // main actions: COLONIZE | RESUPPLY
         // bonus actions: ENERGY_CORE | ALIEN_ARTIFACT | TECH_RESEARCH | NEW_TECH
+        if (canColonizePlanet()) {
+            return;
+        }
         System.out.println("RESUPPLY");
+    }
+
+    private boolean canColonizePlanet() {
+        for (Station myStation : myStations) {
+            if (!myStation.available) {
+                continue;
+            }
+            for (Planet planet : planets) {
+                if (canColonizePlanet(myStation, planet)) {
+                    colonize(myStation, planet);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean canColonizePlanet(Station myStation, Planet planet) {
+        List<Integer> tech = myStation.tech;
+        List<Integer> tasks = planet.tasks;
+
+        for (int i = 0; i < 4; i++) {
+            if (tech.get(i) < tasks.get(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void colonize(Station myStation, Planet planet) {
+        // TODO: Decide bonus
+        System.out.println("COLONIZE " + myStation.id + " " + planet.id + " 0");
     }
 }
 
