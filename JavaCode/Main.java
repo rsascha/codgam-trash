@@ -114,14 +114,18 @@ class Game {
         ratedPairs.clear();
         // main actions: COLONIZE | RESUPPLY
         // bonus actions: ENERGY_CORE | ALIEN_ARTIFACT | TECH_RESEARCH | NEW_TECH
+
+        /**
+         * Check and do bonus moves, which will give us another turn
+         */
         if (shouldUseEnergyCore()) {
             return;
         }
 
+        /**
+         * Main actions. Will end our turn and let the opponent move.
+         */
         if (investInPlanet()) {
-            return;
-        }
-        if (canColonizePlanet()) {
             return;
         }
         System.out.println("RESUPPLY");
@@ -213,37 +217,9 @@ class Game {
         return 0;
     }
 
-    private boolean canColonizePlanet() {
-        for (Station myStation : getAvailableStations()) {
-            for (Planet planet : planets) {
-                if (canColonizePlanet(myStation, planet)) {
-                    colonize(myStation, planet);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean canColonizePlanet(Station myStation, Planet planet) {
-        List<Integer> tech = myStation.tech;
-        List<Integer> tasks = planet.tasks;
-
-        for (int i = 0; i < 4; i++) {
-            if (tech.get(i) < tasks.get(i)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     void colonize(StationPlanetPair pair) {
-        colonize(pair.station, pair.planet);
-    }
-
-    void colonize(Station myStation, Planet planet) {
-        int bonusIndex = bonusIndex(myStation, planet);
-        System.out.println("COLONIZE " + myStation.id + " " + planet.id + " " + bonusIndex);
+        int bonusIndex = bonusIndex(pair.station, pair.planet);
+        System.out.println("COLONIZE " + pair.station.id + " " + pair.planet.id + " " + bonusIndex);
     }
 
     private int bonusIndex(Station myStation, Planet planet) {
