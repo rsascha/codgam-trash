@@ -183,7 +183,7 @@ class Game {
             return 0;
 
         // Can we sack a planet with our move?
-        if ((planet.myContribution + investable) >= planet.remainingPrice()) {
+        if ((planet.myContribution + investable) >= planet.majority()) {
             int score = 100; // can sack in one move. massivly prefer the move
             score += planet.colonizationScore; // the higher the planet score, the preferable
 
@@ -198,7 +198,7 @@ class Game {
             return score;
         }
         // Can't sack planet in one move, but can we still get it?
-        if (planet.oppContribution < planet.remainingPrice()) {
+        if (planet.oppContribution < planet.majority()) {
             return investable;
         }
         // Can't get the planet anymore. Have we already invested? If not, doing so will
