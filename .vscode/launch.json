@@ -6,12 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Simulator",
+            "request": "launch",
+            "mainClass": "Simulator",
+            "projectName": "codgam-trash_b929adec"
+        },
+        {
+            "type": "java",
             "name": "First round",
             "request": "launch",
             "mainClass": "Player",
             "projectName": "codgam-trash_b929adec",
             "args": [
-                "<", "./sascha/first-round.txt"
+                "<",
+                "./sascha/first-round.txt"
             ]
         },
         {
@@ -21,7 +29,8 @@
             "mainClass": "Player",
             "projectName": "codgam-trash_b929adec",
             "args": [
-                "<", "./data/four-rounds.txt"
+                "<",
+                "./data/four-rounds.txt"
             ]
         }
     ]
