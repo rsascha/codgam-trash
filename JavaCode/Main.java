@@ -128,21 +128,27 @@ class Game {
     }
 
     private boolean investInPlanet() {
+        System.err.print("Ratings: ");
         for (Station myStation : getAvailableStations()) {
             for (Planet planet : getRelevantPlanets()) {
                 StationPlanetPair pair = new StationPlanetPair(myStation, planet);
                 int rating = ratePair(myStation, planet);
+                System.err.print("[(" + myStation.id + "->" + planet.id + "):" + rating + "] ");
                 ratedPairs.put(pair, rating);
             }
         }
+        System.err.println();
 
         Optional<Map.Entry<StationPlanetPair, Integer>> bestRating = ratedPairs.entrySet().stream()
                 .max(Comparator.comparingInt(Map.Entry::getValue));
 
         if (bestRating.isPresent()) {
             StationPlanetPair bestPair = bestRating.get().getKey();
-            if (ratedPairs.get(bestPair) > 0) {
+            int rating = ratedPairs.get(bestPair);
+            if (rating > 0) {
                 colonize(bestPair);
+                System.err
+                        .println("Chosen: [(" + bestPair.station.id + "->" + bestPair.planet.id + "):" + rating + "]");
                 return true;
             }
         }
