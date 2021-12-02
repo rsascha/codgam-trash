@@ -121,6 +121,9 @@ class Game {
         if (shouldUseEnergyCore()) {
             return;
         }
+        if (checkTechupgrades()) {
+            return;
+        }
 
         /**
          * Main actions. Will end our turn and let the opponent move.
@@ -129,6 +132,67 @@ class Game {
             return;
         }
         System.out.println("RESUPPLY");
+    }
+
+    private boolean checkTechupgrades() {
+        // Build a map of all tech upgrades we currently have
+        // Key: level the upgrade will generate
+        // Value: amount of upgrades of this type (Maybe unneeded?)
+        Map<Integer, Integer> upgrades = new HashMap<>(3);
+        for (int i = 2; i <= 4; i++) {
+            upgrades.put(i, 0);
+        }
+        for (String bonus : myBonuses) {
+            if (bonus.startsWith("TECH_RESEARCH")) {
+                int value = Integer.parseInt(bonus.substring(bonus.length() - 1));
+                upgrades.merge(value, 1, Integer::sum);
+
+            }
+        }
+
+        // Order stations by score, try to upgrade where the most gain is
+        List<Station> upgradeOrder = new ArrayList<>();
+        // Don't boost unavailable stations, because we can't use the new bonus right
+        // away. Also ignore fulley upgrades stations
+        for (Station station : getAvailableStations()) {
+            if (!techObjectiveReached(station)) {
+                upgradeOrder.add(station);
+            }
+        }
+        // sort by highest gain
+        upgradeOrder.sort((s1, s2) -> {
+            return Integer.compare(stationObjectives.get(s1.id).objectiveScore,
+                    stationObjectives.get(s2.id).objectiveScore);
+        });
+        Collections.reverse(upgradeOrder);
+
+        // Loop until we can upgrade something
+        for (Station station : upgradeOrder) {
+            for (int i = 0; i < stationObjectives.get(station.id).objective.size(); i++) {
+                int objective = stationObjectives.get(station.id).objective.get(i);
+                int current = station.tech.get(i);
+                if (current < objective) {
+                    // To get from 0 to 1, we must use NEW_TECH instead
+                    if (current > 0 && upgrades.get(current + 1) > 0) {
+                        // We can upgrade this tech, so do it.
+                        System.err.println("Upgrading tech " + i + " of station " + station.id + " to " + current + 1);
+                        System.out.println("TECH_RESEARCH " + station.id + " " + i);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean techObjectiveReached(Station station) {
+        for (int i = 0; i < station.tech.size(); i++) {
+            if (station.tech.get(i) < stationObjectives.get(station.id).objective.get(i)) {
+                // If any techlevel is lower than its objective, station is still has to be
+                // upgraded
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean investInPlanet() {
