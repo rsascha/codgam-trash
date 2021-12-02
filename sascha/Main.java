@@ -89,6 +89,8 @@ class Player {
 
         Game mainGame = new Game();
 
+        System.out.println(System.in);
+
         Scanner in = new Scanner(System.in);
         for (int i = 0; i < 8; i++) {
             int stationId = in.nextInt();
