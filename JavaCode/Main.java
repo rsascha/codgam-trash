@@ -145,16 +145,17 @@ class Game {
         List<Integer> tech = station.tech;
         List<Integer> tasks = planet.tasks;
 
-        int rating = 0;
+        int investable = 0;
         for (int i = 0; i < 4; i++) {
-            rating += Math.min(tech.get(i), tasks.get(i));
+            investable += Math.min(tech.get(i), tasks.get(i));
         }
 
         // Planet Price 5
         // myContribution 0
         // rating 2
 
-        return planet.pointsToMajority() - planet.myContribution - rating;
+        int missing = planet.pointsToMajority() - planet.myContribution;
+        return investable - missing;
     }
 
     private boolean canInvestAllPoints(Station myStation, Planet planet) {
